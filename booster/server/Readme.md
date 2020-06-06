@@ -6,6 +6,9 @@ yarn add ts-node -D
 yarn add ts-node-dev -D
 yarn add knex
 yarn add sqlite3
+yarn add cors
+yarn add @types/cors -D
+
 
 Configuração
 npx tsc --init
