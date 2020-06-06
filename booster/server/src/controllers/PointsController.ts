@@ -2,6 +2,23 @@ import { Request, Response } from 'express';
 import knex from '../database/connection';
 
 const PointsController = {
+  async show(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const point = await knex('points').where('id', id).first();
+
+    if (!point) {
+      return response.status(400).json({ message: 'Point not found.' });
+    };
+
+    const items = await knex('items')
+      .join('point_items', 'items.id', '=', 'point_items.item_id')
+      .where('point_items.point_id', id)
+      .select('items.title', 'items.image')
+
+    return response.json({ point, items });
+  },
+
   async create(request: Request, response: Response) {
     const {
       name,
@@ -16,7 +33,7 @@ const PointsController = {
 
     const trx = await knex.transaction();
 
-    const insertedIds = await trx('points').insert({
+    const point = {
       image: 'image-fake',
       name,
       email,
@@ -25,7 +42,9 @@ const PointsController = {
       longitude,
       city,
       uf,
-    });
+    };
+
+    const insertedIds = await trx('points').insert(point);
 
     const point_id = insertedIds[0]
 
@@ -39,7 +58,10 @@ const PointsController = {
     await trx('point_items').insert(point_items);
     await trx.commit()
 
-    return response.json({ success: true });
+    return response.json({
+      id: point_id,
+      ...point,
+    });
   },
 };
 
