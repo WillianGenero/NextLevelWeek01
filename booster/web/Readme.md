@@ -4,3 +4,4 @@ yarn add react-router-dom
 yarn add @types/react-router-dom -D
 yarn add leaflet react-leaflet
 yarn add @types/react-leaflet -D
+yarn add axios
