@@ -1,0 +1,4 @@
+Pacotes
+yarn add react-icons
+yarn add react-router-dom
+yarn add @types/react-router-dom -D
