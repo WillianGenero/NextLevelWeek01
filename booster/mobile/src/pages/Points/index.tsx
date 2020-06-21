@@ -1,25 +1,24 @@
 import React from 'react'
-import { TouchableOpacity, ScrollView } from 'react-native'
+import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Feather as Icon } from '@expo/vector-icons'
 import { SvgUri } from 'react-native-svg'
 import MapView, { Marker } from 'react-native-maps'
-import Constants from 'expo-constants'
 import styled from 'styled-components/native'
 
 const Points = () => {
   const navigation = useNavigation()
 
-  function handleNavigateBack () {
+  function handleNavigateBack() {
     navigation.goBack()
   }
 
-  function handleNavigateToDetail () {
+  function handleNavigateToDetail() {
     navigation.navigate('Detail')
   }
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <Container>
         <TouchableOpacity onPress={handleNavigateBack}>
           <Icon name="arrow-left" size={20} color="#34CB79" />
@@ -45,7 +44,7 @@ const Points = () => {
               }}
             >
               <MapMarkerContainer>
-                <Image resizeMode='cover' source={{ uri:'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'}} />
+                <Image resizeMode='cover' source={{ uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60' }} />
                 <MapMarkerTitle>Mercado</MapMarkerTitle>
               </MapMarkerContainer>
             </Marker>
@@ -54,31 +53,31 @@ const Points = () => {
       </Container>
 
 
-        <ItemsContainer>
-          <ScrollView
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-          >
-            <Item onPress={() => {}}>
-              <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-              <ItemTitle>Lâmpadas</ItemTitle>
-            </Item>
-            <Item onPress={() => {}}>
-              <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-              <ItemTitle>Lâmpadas</ItemTitle>
-            </Item>
-            <Item onPress={() => {}}>
-              <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-              <ItemTitle>Lâmpadas</ItemTitle>
-            </Item>
-            <Item onPress={() => {}}>
-              <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-              <ItemTitle>Lâmpadas</ItemTitle>
-            </Item>
-          </ScrollView>
+      <ItemsContainer>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+        >
+          <Item onPress={() => {}}>
+            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
+            <ItemTitle>Lâmpadas</ItemTitle>
+          </Item>
+          <Item onPress={() => {}}>
+            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
+            <ItemTitle>Lâmpadas</ItemTitle>
+          </Item>
+          <Item onPress={() => {}}>
+            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
+            <ItemTitle>Lâmpadas</ItemTitle>
+          </Item>
+          <Item onPress={() => {}}>
+            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
+            <ItemTitle>Lâmpadas</ItemTitle>
+          </Item>
+        </ScrollView>
       </ItemsContainer>
-    </>
+    </SafeAreaView>
   )
 }
 
@@ -87,7 +86,7 @@ export default Points
 const Container = styled.View`
   flex: 1;
   padding: 0 32px;
-  padding-top: ${Constants.statusBarHeight+20}px;
+  padding-top: 20px;
 `
 
 const MapContainer = styled.View`
