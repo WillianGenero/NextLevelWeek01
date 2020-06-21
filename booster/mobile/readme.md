@@ -12,6 +12,7 @@ expo install react-native-maps
 expo install react-native-svg
 yarn add axios
 expo install expo-location
+expo install expo-mail-composer
 
 Fontes
 expo install expo-font @expo-google-fonts/Ubuntu

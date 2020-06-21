@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView, TouchableOpacity } from 'react-native'
+import { Linking, SafeAreaView, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { RectButton } from 'react-native-gesture-handler'
 import { Feather, FontAwesome } from '@expo/vector-icons'
+import * as MailComposer from 'expo-mail-composer'
 import api from '../../service/api'
 import styled from 'styled-components/native'
 
@@ -42,6 +43,17 @@ const Detail = () => {
     navigation.goBack()
   }
 
+  function handleWhatsapp() {
+    Linking.openURL(`whatsapp://send?phone=${data.point.whatsapp}&text=Tenho interesse na coleta de resíduos`)
+  }
+
+  function handleComposeMail() {
+    MailComposer.composeAsync({
+      subject: 'Interesse na coleta de resíduos',
+      recipients: [data.point.email]
+    })
+  }
+
   if (!data.point) {
     return null
   }
@@ -68,12 +80,12 @@ const Detail = () => {
       </Container>
 
       <Footer>
-        <Button onPress={() => {}}>
+        <Button onPress={handleWhatsapp}>
           <FontAwesome name="whatsapp" size={20} color="#FFF" />
           <ButtonText>Whatsapp</ButtonText>
         </Button>
 
-        <Button onPress={() => {}}>
+        <Button onPress={handleComposeMail}>
           <Feather name="mail" size={20} color="#FFF" />
           <ButtonText>E-mail</ButtonText>
         </Button>
