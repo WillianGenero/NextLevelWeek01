@@ -1,20 +1,83 @@
-import React from 'react'
-import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState} from 'react'
+import { Alert, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Feather as Icon } from '@expo/vector-icons'
-import { SvgUri } from 'react-native-svg'
+import * as Location from 'expo-location'
 import MapView, { Marker } from 'react-native-maps'
+import api from '../../service/api'
 import styled from 'styled-components/native'
 
+interface Item {
+  id: number,
+  title: string,
+  image_url: string,
+}
+
+interface Point {
+  id: number,
+  name: string,
+  image: string,
+  latitude: number,
+  longitude: number,
+}
+
 const Points = () => {
+  const [items, setItems] = useState<Item[]>([])
+  const [points, setPoints] = useState<Point[]>([])
+  const [selectedItems, setSelectedItems] = useState<number[]>([])
+
+  const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
+
   const navigation = useNavigation()
+
+  useEffect(() => {
+    async function loadPosition() {
+      const { status } = await Location.requestPermissionsAsync()
+
+      if (status !== 'granted') {
+        Alert.alert('Oooops...', 'Precisamos de sua permissão para obter a localização')
+        return
+      }
+      const location = await Location.getCurrentPositionAsync()
+
+      setInitialPosition([location.coords.latitude, location.coords.longitude])
+    }
+
+    loadPosition()
+  }, [])
+
+  useEffect(() => {
+    api.get('/items').then(response => {
+      setItems(response.data)
+    })
+  }, [])
+
+  useEffect(() => {
+    api.get('/points', {
+      params: {
+        city: 'Santiago do Sul',
+        uf: 'SC',
+        items: [1]
+      }
+    }).then(response => {
+      setPoints(response.data)
+    })
+  }, [])
 
   function handleNavigateBack() {
     navigation.goBack()
   }
 
-  function handleNavigateToDetail() {
-    navigation.navigate('Detail')
+  function handleNavigateToDetail(id: number) {
+    navigation.navigate('Detail', { point_id: id })
+  }
+
+  function handleSelectItems(id: number) {
+    const alreadySelected = selectedItems.findIndex(item => item === id)
+
+    alreadySelected >= 0
+    ? setSelectedItems(selectedItems.filter(item => item !== id))
+    : setSelectedItems([ ...selectedItems, id])
   }
 
   return (
@@ -28,27 +91,36 @@ const Points = () => {
         <Description>Encontre no mapa um ponto de coleta</Description>
 
         <MapContainer>
-          <Map
-            initialRegion={{
-              latitude: -26.6367819,
-              longitude: -52.6804481,
-              latitudeDelta: 0.014,
-              longitudeDelta: 0.014,
-            }}
-          >
-            <Marker
-              onPress={handleNavigateToDetail}
-              coordinate={{
-                latitude: -26.6367819,
-                longitude: -52.6804481,
-              }}
-            >
-              <MapMarkerContainer>
-                <Image resizeMode='cover' source={{ uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60' }} />
-                <MapMarkerTitle>Mercado</MapMarkerTitle>
-              </MapMarkerContainer>
-            </Marker>
-          </Map>
+          {
+            initialPosition[0] !== 0 && (
+              <Map
+                initialRegion={{
+                  latitude: initialPosition[0],
+                  longitude: initialPosition[1],
+                  latitudeDelta: 0.014,
+                  longitudeDelta: 0.014,
+                }}
+              >
+                {
+                  points.map(point => (
+                    <Marker
+                      key={String(point.id)}
+                      onPress={() => handleNavigateToDetail(point.id)}
+                      coordinate={{
+                        latitude: point.latitude,
+                        longitude: point.longitude,
+                      }}
+                    >
+                      <MapMarkerContainer>
+                        <Image resizeMode='cover' source={{ uri: point.image }} />
+                        <MapMarkerTitle>{point.name}}</MapMarkerTitle>
+                      </MapMarkerContainer>
+                    </Marker>
+                  ))
+                }
+              </Map>
+            )
+          }
         </MapContainer>
       </Container>
 
@@ -59,22 +131,18 @@ const Points = () => {
           showsHorizontalScrollIndicator={false}
           horizontal
         >
-          <Item onPress={() => {}}>
-            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-            <ItemTitle>Lâmpadas</ItemTitle>
-          </Item>
-          <Item onPress={() => {}}>
-            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-            <ItemTitle>Lâmpadas</ItemTitle>
-          </Item>
-          <Item onPress={() => {}}>
-            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-            <ItemTitle>Lâmpadas</ItemTitle>
-          </Item>
-          <Item onPress={() => {}}>
-            <SvgUri width={42} height={42} uri="http://192.168.0.105:3333/uploads/lampadas.svg" />
-            <ItemTitle>Lâmpadas</ItemTitle>
-          </Item>
+          {
+            items.map(item => (
+              <Item
+                key={String(item.id)}
+                activeOpacity={0.6}
+                onPress={() => handleSelectItems(item.id)}
+                select={selectedItems.includes(item.id) ? true : false}
+              >
+                <ItemTitle>{item.title}</ItemTitle>
+              </Item>
+            ))
+          }
         </ScrollView>
       </ItemsContainer>
     </SafeAreaView>
@@ -86,7 +154,7 @@ export default Points
 const Container = styled.View`
   flex: 1;
   padding: 0 32px;
-  padding-top: 20px;
+  padding-top: 50px;
 `
 
 const MapContainer = styled.View`
@@ -118,14 +186,18 @@ const Map = styled(MapView)`
   height: 100%;
 `
 
-const Item = styled.TouchableOpacity`
+interface ItemProps {
+  select: boolean,
+}
+
+const Item = styled.TouchableOpacity<ItemProps>`
   height: 120px;
   width: 120px;
   text-align: center;
   align-items: center;
   justify-content: space-between;
   background-color: #FFF;
-  border-color: #EEE;
+  border-color: ${p => p.select ? `#34CB79` : `#FFF`};
   border-width: 2px;
   border-radius: 8px;
   padding-top: 20px;
@@ -139,7 +211,6 @@ const Image = styled.Image`
   width: 90px;
   height: 45px;
 `
-
 
 const Title = styled.Text`
   font-size: 20px;

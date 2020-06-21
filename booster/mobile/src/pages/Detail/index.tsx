@@ -1,15 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView, TouchableOpacity } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { RectButton } from 'react-native-gesture-handler'
 import { Feather, FontAwesome } from '@expo/vector-icons'
+import api from '../../service/api'
 import styled from 'styled-components/native'
 
+interface DetailProps {
+  point_id: number,
+}
+
+interface Data {
+  point: {
+    image: string,
+    name: string,
+    email: string,
+    whatsapp: string,
+    city: string,
+    uf: string,
+  }
+  items: {
+    title: string
+  }[]
+}
+
 const Detail = () => {
+  const [data, setData] = useState<Data>({} as Data)
+
   const navigation = useNavigation()
+  const route = useRoute()
+
+  const routeParams = route.params as DetailProps
+
+  useEffect(() => {
+    api.get(`points/${routeParams.point_id}`).then(response => {
+      setData(response.data)
+    })
+  }, [])
 
   function handleNavigateBack() {
     navigation.goBack()
+  }
+
+  if (!data.point) {
+    return null
   }
 
   return (
@@ -19,13 +53,17 @@ const Detail = () => {
           <Feather name="arrow-left" size={20} color="#34CB79" />
         </TouchableOpacity>
 
-        <PointImage source={{ uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60' }} />
-        <PointName>Mercadão do João</PointName>
-        <PointItems>Lâmpadas, Óleo de Cozinha</PointItems>
+        <PointImage source={{ uri: data.point.image }} />
+        <PointName>{data.point.name}</PointName>
+        <PointItems>
+          {
+            data.items.map(item => item.title).join(', ')
+          }
+        </PointItems>
 
         <Address>
           <AddressTitle>Endereço</AddressTitle>
-          <AddressContent>Santiago do Sul</AddressContent>
+          <AddressContent>{data.point.city}, {data.point.uf}</AddressContent>
         </Address>
       </Container>
 
@@ -49,7 +87,7 @@ export default Detail
 const Container = styled.View`
   flex: 1;
   padding: 32px;
-  padding-top: 20px;
+  padding-top: 50px;
 `
 
 const Address = styled.View`
