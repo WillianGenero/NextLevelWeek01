@@ -1,18 +1,37 @@
-import React from 'react';
-import { Feather as Icon } from '@expo/vector-icons';
-import { Image, View } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { Image, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native'
+import { Feather } from '@expo/vector-icons';
 import styled from 'styled-components/native'
 
+interface IBGEUFResponse {
+  sigla: string,
+  nome: string,
+}
+
+interface uf {
+  label: string,
+  value: string,
+}
+
 const Home = () => {
+  const [uf, setUf] = useState('')
+  const [city, setCity] = useState('')
+
+  const cityRef = useRef(null)
+
   const navigation = useNavigation()
 
   function handleNavigateToPoints() {
-    navigation.navigate('Points')
+    navigation.navigate('Points', {
+      uf,
+      city,
+    })
   }
 
   return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Container
         source={require('../../assets/home-background.png')}
         imageStyle={{ width: 274, height: 368 }}
@@ -26,14 +45,34 @@ const Home = () => {
         </Main>
 
         <Footer>
-          <Button onPress={() => handleNavigateToPoints()}>
+          <Input
+            placeholder="Digite a UF"
+            maxLength={2}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            returnKeyType="next"
+            value={uf}
+            onChangeText={setUf}
+            onSubmitEditing={() => cityRef.current.focus()}
+          />
+          <Input
+            placeholder="Digite a Cidade"
+            autoCorrect={false}
+            value={city}
+            onChangeText={setCity}
+            ref={cityRef}
+            onSubmitEditing={handleNavigateToPoints}
+          />
+
+          <Button onPress={handleNavigateToPoints}>
             <ButtonIcon>
-              <Icon name="arrow-right" color="#FFF" size={24} />
+              <Feather name="arrow-right" color="#FFF" size={24} />
             </ButtonIcon>
             <ButtonText>Entrar</ButtonText>
           </Button>
         </Footer>
       </Container>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -59,6 +98,15 @@ const ButtonIcon = styled.View`
     background-color: rgba(0, 0, 0, 0.1);
     justify-content: center;
     align-items: center;
+`
+
+const Input = styled.TextInput`
+  height: 60px;
+  background-color: #FFF;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  padding: 0 24px;
+  font-size: 16px;
 `
 
 const ButtonText = styled.Text`
