@@ -10,7 +10,8 @@ yarn add cors
 yarn add @types/cors -D
 yarn add multer
 yarn add @types/multer -D
-
+yarn add celebrate
+yarn add @types/hapi__joi -D
 
 Configuração
 npx tsc --init
