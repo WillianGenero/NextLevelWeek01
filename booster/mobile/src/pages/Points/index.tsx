@@ -1,7 +1,8 @@
 import React, { useEffect, useState} from 'react'
 import { Alert, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Feather as Icon } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons'
+import { SvgUri } from 'react-native-svg'
 import * as Location from 'expo-location'
 import MapView, { Marker } from 'react-native-maps'
 import api from '../../service/api'
@@ -93,7 +94,7 @@ const Points = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
         <TouchableOpacity onPress={handleNavigateBack}>
-          <Icon name="arrow-left" size={20} color="#34CB79" />
+          <Feather name="arrow-left" size={20} color="#34CB79" />
         </TouchableOpacity>
 
         <Title>Bem vindo.</Title>
@@ -147,6 +148,7 @@ const Points = () => {
                 onPress={() => handleSelectItems(item.id)}
                 select={selectedItems.includes(item.id) ? true : false}
               >
+                <SvgUri width={42} height={42} uri={item.image_url} />
                 <ItemTitle>{item.title}</ItemTitle>
               </Item>
             ))
