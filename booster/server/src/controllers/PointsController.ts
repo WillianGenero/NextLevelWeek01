@@ -15,7 +15,14 @@ const PointsController = {
       .distinct()
       .select('points.*');
 
-    return response.json(points);
+    const serializedPoints = points.map(points => {
+      return {
+        ...points,
+        image_url: `http://192.168.0.105:3333/uploads/${point.image}`
+      }
+    })
+
+    return response.json(serializedPoints);
   },
 
   async show(request: Request, response: Response) {
@@ -32,7 +39,12 @@ const PointsController = {
       .where('point_items.point_id', id)
       .select('items.title', 'items.image')
 
-    return response.json({ point, items });
+    const serializedPoint = {
+      ...point,
+      image_url: `http://192.168.0.105:3333/uploads/${point.image}`
+    }
+
+    return response.json({ serializedPoint, items });
   },
 
   async create(request: Request, response: Response) {
