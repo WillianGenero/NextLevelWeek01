@@ -14,6 +14,7 @@ interface DetailProps {
 interface Data {
   point: {
     image: string,
+    image_url: string,
     name: string,
     email: string,
     whatsapp: string,
@@ -65,7 +66,7 @@ const Detail = () => {
           <Feather name="arrow-left" size={20} color="#34CB79" />
         </TouchableOpacity>
 
-        <PointImage source={{ uri: data.point.image }} />
+        <PointImage source={{ uri: data.point.image_url }} />
         <PointName>{data.point.name}</PointName>
         <PointItems>
           {
